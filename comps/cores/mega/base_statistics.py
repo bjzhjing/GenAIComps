@@ -77,8 +77,10 @@ def register_statistics(
 
 def collect_all_statistics():
     results = {}
+    print(f"collect all_statistics!")
     if statistics_dict:
         for name, statistic in statistics_dict.items():
+            print(f"Name: {name}, Statistic: {statistic}")  # Print the name and statistic object
             tmp_dict = statistic.calcuate_statistics()
             tmp_dict.update(statistic.calcuate_first_token_statistics())
             results.update({name: tmp_dict})
