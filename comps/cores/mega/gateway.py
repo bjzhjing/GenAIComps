@@ -16,6 +16,9 @@ from ..proto.docarray import LLMParams
 from .constants import MegaServiceEndpoint, ServiceRoleType, ServiceType
 from .micro_service import MicroService
 
+import time
+from .base_statistics import register_statistics, statistics_dict
+
 
 class Gateway:
     def __init__(
@@ -106,7 +109,9 @@ class ChatQnAGateway(Gateway):
             megaservice, host, port, str(MegaServiceEndpoint.CHAT_QNA), ChatCompletionRequest, ChatCompletionResponse
         )
 
+    @register_statistics(names=["ChatQnAGateway"])
     async def handle_request(self, request: Request):
+        start = time.time()
         data = await request.json()
         stream_opt = data.get("stream", True)
         chat_request = ChatCompletionRequest.parse_obj(data)
@@ -120,6 +125,7 @@ class ChatQnAGateway(Gateway):
             streaming=stream_opt,
         )
         result_dict = await self.megaservice.schedule(initial_inputs={"text": prompt}, llm_parameters=parameters)
+        statistics_dict["ChatQnAGateway"].append_latency(time.time() - start, None)
         for node, response in result_dict.items():
             # Here it suppose the last microservice in the megaservice is LLM.
             if (
