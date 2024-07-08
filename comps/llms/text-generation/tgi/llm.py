@@ -42,6 +42,7 @@ def llm_generate(input: LLMParamsDoc):
         streaming=input.streaming,
         timeout=600,
     )
+    print(f"Query: {input.query} Streaming: {input.streaming}")  # Print the input query
     if input.streaming:
         stream_gen_time = []
 
